@@ -1,4 +1,21 @@
-# IntelliJ Platform Plugin Template
+# Problem Grabber
+
+<!-- Plugin description -->
+Problem Grabber captures problem details from IntelliJ IDEA in a format optimized for sharing with Large Language Models (LLMs). It allows you to easily copy problem details, including line numbers, file paths, error messages, and quick fix suggestions, to help get better assistance from LLMs.
+<!-- Plugin description end -->
+
+## Features
+
+- Capture single problem details
+- Capture all problems in a file
+- Capture all problems in a project
+- Filter problems by severity or type
+- Export to clipboard or file
+- Format problems in LLM-friendly format
+
+---
+ORIGINAL:
+---
 
 [![official JetBrains project](https://jb.gg/badges/official.svg)][jb:github]
 [![Twitter Follow](https://img.shields.io/badge/follow-%40JBPlatform-1DA1F2?logo=twitter)](https://twitter.com/JBPlatform)

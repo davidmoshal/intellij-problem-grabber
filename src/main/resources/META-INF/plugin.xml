@@ -1,18 +1,48 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
-    <id>org.jetbrains.plugins.template</id>
-    <name>IntelliJ Platform Plugin Template</name>
-    <vendor>JetBrains</vendor>
+    <id>com.github.davidmoshal.problemgrabber</id>
+    <name>Problem Grabber</name>
+    <vendor>davidmoshal</vendor>
+    <description><![CDATA[
+        Capture IntelliJ problems for sharing with LLMs.
+        <br>
+        Features:
+        <ul>
+            <li>Capture problems in a file</li>
+            <li>Capture all project problems</li>
+            <li>Format problems in LLM-friendly markdown format</li>
+            <li>Copy to clipboard for easy sharing</li>
+        </ul>
+    ]]></description>
+    <version>1.0.0</version>
+    <change-notes><![CDATA[
+        Initial release of Problem Grabber.
+    ]]></change-notes>
+
+    <!-- Specify compatibility with IntelliJ platform versions -->
+    <idea-version since-build="233" until-build="244.*" />
 
     <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.lang</depends>
 
-    <resource-bundle>messages.MyBundle</resource-bundle>
+    <projectListeners>
+    </projectListeners>
 
-    <extensions defaultExtensionNs="com.intellij">
-        <toolWindow factoryClass="org.jetbrains.plugins.template.toolWindow.MyToolWindowFactory" id="MyToolWindow"/>
-    </extensions>
+    <projectServices>
+        <service serviceImplementation="com.github.davidmoshal.problemgrabber.services.ProblemGrabberService"/>
+    </projectServices>
 
-    <applicationListeners>
-        <listener class="org.jetbrains.plugins.template.listeners.MyApplicationActivationListener" topic="com.intellij.openapi.application.ApplicationActivationListener"/>
-    </applicationListeners>
+    <actions>
+        <!-- Add main action -->
+        <action id="ProblemGrabber.CaptureProblems"
+                class="com.github.davidmoshal.problemgrabber.actions.CaptureProblemsAction"
+                text="Capture Problems for LLM"
+                description="Copy problems to clipboard in LLM-friendly format">
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+            <keyboard-shortcut keymap="$default" first-keystroke="alt shift P" />
+        </action>
+    </actions>
+
 </idea-plugin>
