@@ -78,6 +78,7 @@ class CaptureProblemsAction : ActionGroup() {
                     }
                     problemGrabberService.getProblemsForFile(psiFile, severityFilter)
                 }
+
                 Scope.PROJECT -> {
                     problemGrabberService.getProblemsForProject(severityFilter)
                 }
@@ -105,11 +106,40 @@ class CaptureProblemsAction : ActionGroup() {
                 .notify(project)
         }
 
+        // Inside the formatProblems method in BaseProblemCaptureAction class
         private fun formatProblems(project: Project, problems: List<ProblemData>): String {
             val sb = StringBuilder()
             sb.appendLine("# Project Problems: ${project.name}")
             sb.appendLine("Total problems: ${problems.size}")
             sb.appendLine()
+
+            // Add summary by severity
+            if (problems.isNotEmpty()) {
+                sb.appendLine("## Problem Severity Summary")
+                val severityCounts = problems.groupBy { it.severity }
+                    .mapValues { it.value.size }
+                    .toList()
+                    .sortedByDescending { it.second }
+
+                for ((severity, count) in severityCounts) {
+                    sb.appendLine("- $severity: $count")
+                }
+
+                sb.appendLine()
+
+                // Add summary by type
+                sb.appendLine("## Problem Type Summary")
+                val typeCounts = problems.groupBy { it.type }
+                    .mapValues { it.value.size }
+                    .toList()
+                    .sortedByDescending { it.second }
+
+                for ((type, count) in typeCounts) {
+                    sb.appendLine("- $type: $count")
+                }
+
+                sb.appendLine()
+            }
 
             problems.forEachIndexed { index, problem ->
                 sb.appendLine("## Problem ${index + 1}")
@@ -140,6 +170,7 @@ class CaptureProblemsAction : ActionGroup() {
 
             return sb.toString()
         }
+
     }
 
     // Concrete action implementations

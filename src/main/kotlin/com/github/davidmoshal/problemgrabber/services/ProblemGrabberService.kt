@@ -21,6 +21,18 @@ import com.intellij.psi.PsiManager
 class ProblemGrabberService(private val project: Project) {
     private val logger = Logger.getInstance(ProblemGrabberService::class.java)
 
+    // Define severities to exclude by default
+    private val excludedSeverities = setOf(
+        "SYMBOL_TYPE_SEVERITY",
+        "INFORMATION",
+        "INFO",
+        "TEXT_ATTRIBUTES",
+        "INJECTED_FRAGMENT_SYNTAX_SEVERITY",
+        "INJECTED_FRAGMENT_SEVERITY",
+        "ELEMENT_UNDER_CARET_SEVERITY",
+        "HIGHLIGHTED_REFERENCE_SEVERITY"
+    )
+
     /**
      * Get problems for the current project
      */
@@ -73,7 +85,7 @@ class ProblemGrabberService(private val project: Project) {
     }
 
     /**
-     * Get problems for the current project
+     * Get problems for a specific file
      */
     fun getProblemsForFile(psiFile: PsiFile, severityFilter: Set<HighlightSeverity>? = null): List<ProblemData> {
         logger.info("Getting problems for file: ${psiFile.name}")
@@ -88,11 +100,11 @@ class ProblemGrabberService(private val project: Project) {
 
         logger.info("Found ${highlights.size} highlights for file ${file.name}")
 
-        // Filter by severity if requested
-        val filteredHighlights = if (severityFilter != null) {
-            highlights.filter { info -> severityFilter.contains(info.severity) }
-        } else {
-            highlights
+        // Filter by severity if requested, and always exclude non-problem severities
+        val filteredHighlights = highlights.filter { info ->
+            // Include only if it passes both filters
+            (severityFilter == null || severityFilter.contains(info.severity)) &&
+                    !excludedSeverities.contains(info.severity.name)
         }
 
         return filteredHighlights.map { info ->
@@ -120,8 +132,7 @@ class ProblemGrabberService(private val project: Project) {
      * Get quick fix information if available
      */
     private fun getQuickFix(info: HighlightInfo): String? {
-       // return info.quickFixActionRanges?.firstOrNull()?.first?.action?.text
-        return info.findRegisteredQuickFix { descriptor, _ -> descriptor.action.text }
+        return info.quickFixActionRanges?.firstOrNull()?.first?.action?.text
     }
 
     /**
@@ -140,7 +151,7 @@ class ProblemGrabberService(private val project: Project) {
     /**
      * Extract surrounding code from a document
      */
-    private fun extractSurroundingCode(document: Document, line: Int, contextLines: Int): String {
+    private fun extractSurroundingCode(document: Document, line: Int, contextLines: Int = 3): String {
         if ((line < 0) || (line >= document.lineCount)) {
             return ""
         }
@@ -163,47 +174,5 @@ class ProblemGrabberService(private val project: Project) {
         }
 
         return result.toString()
-    }
-
-    /**
-     * Export problems to file
-     */
-    internal fun exportToFile(problems: List<ProblemData>, filePath: String) {
-        logger.info("Exporting ${problems.size} problems to file: $filePath")
-
-        val sb = StringBuilder()
-        sb.appendLine("# Project Problems: ${project.name}")
-        sb.appendLine("Total problems: ${problems.size}")
-        sb.appendLine()
-
-        problems.forEachIndexed { index, problem ->
-            sb.appendLine("## Problem ${index + 1}")
-            sb.appendLine("## Problem Details")
-            sb.appendLine("- **Message**: ${problem.message}")
-            sb.appendLine("- **Description**: ${problem.description}")
-            sb.appendLine("- **Type**: ${problem.type}")
-            sb.appendLine("- **Severity**: ${problem.severity}")
-            sb.appendLine("- **File**: ${problem.filePath}")
-            sb.appendLine("- **Line**: ${problem.line}")
-            sb.appendLine("- **Column**: ${problem.column}")
-            sb.appendLine()
-
-            sb.appendLine("### Problematic Code")
-            sb.appendLine("```")
-            sb.appendLine(problem.code)
-            sb.appendLine("```")
-            sb.appendLine()
-
-            sb.appendLine("### Code Context")
-            sb.appendLine("```")
-            sb.appendLine(problem.surroundingCode)
-            sb.appendLine("```")
-            sb.appendLine()
-
-            sb.appendLine("---")
-        }
-
-        // Write to file
-        java.io.File(filePath).writeText(sb.toString())
     }
 }
