@@ -9,20 +9,81 @@
     <depends>com.intellij.modules.platform</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-        <notificationGroup id="Problem Grabber"
+        <notificationGroup id="ProblemGrabber"
                            displayType="BALLOON"
                            toolWindowId="Problems"/>
     </extensions>
 
     <actions>
-        <!-- Main Problem Grabber action group -->
-        <group id="ProblemGrabber.MainGroup"
-               class="com.github.davidmoshal.problemgrabber.actions.CaptureProblemsAction"
-               text="Problem Grabber"
-               description="Problem Grabber tools"
-               popup="true">
+        <!-- Tools Menu - Grouped in submenu -->
+        <group id="ProblemGrabber.ToolsGroup" text="Problem Grabber" popup="true">
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+
+            <action id="ProblemGrabber.CaptureFileErrors"
+                    class="com.github.davidmoshal.problemgrabber.actions.CaptureFileErrorsAction"
+                    text="Capture File Errors"
+                    description="Capture error-level problems in the current file"/>
+
+            <action id="ProblemGrabber.CaptureFileProblems"
+                    class="com.github.davidmoshal.problemgrabber.actions.CaptureFileProblemsAction"
+                    text="Capture File Problems"
+                    description="Capture all problems in the current file"/>
+
+            <action id="ProblemGrabber.CaptureProjectErrors"
+                    class="com.github.davidmoshal.problemgrabber.actions.CaptureProjectErrorsAction"
+                    text="Capture Project Errors"
+                    description="Capture error-level problems in the entire project"/>
+
+            <action id="ProblemGrabber.CaptureProjectProblems"
+                    class="com.github.davidmoshal.problemgrabber.actions.CaptureProjectProblemsAction"
+                    text="Capture Project Problems"
+                    description="Capture all problems in the entire project"/>
+        </group>
+
+        <!-- Context Menu - Flat with separators -->
+        <!-- Add a separator before Problem Grabber actions -->
+        <action id="ProblemGrabber.SeparatorBefore" class="com.intellij.openapi.actionSystem.Separator">
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
             <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
-        </group>
+        </action>
+
+        <!-- Add the actions directly to context menus -->
+        <action id="ProblemGrabber.ContextCaptureFileErrors"
+                class="com.github.davidmoshal.problemgrabber.actions.CaptureFileErrorsAction"
+                text="Capture File Errors"
+                description="Capture error-level problems in the current file">
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
+        </action>
+
+        <action id="ProblemGrabber.ContextCaptureFileProblems"
+                class="com.github.davidmoshal.problemgrabber.actions.CaptureFileProblemsAction"
+                text="Capture File Problems"
+                description="Capture all problems in the current file">
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
+        </action>
+
+        <action id="ProblemGrabber.ContextCaptureProjectErrors"
+                class="com.github.davidmoshal.problemgrabber.actions.CaptureProjectErrorsAction"
+                text="Capture Project Errors"
+                description="Capture error-level problems in the entire project">
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
+        </action>
+
+        <action id="ProblemGrabber.ContextCaptureProjectProblems"
+                class="com.github.davidmoshal.problemgrabber.actions.CaptureProjectProblemsAction"
+                text="Capture Project Problems"
+                description="Capture all problems in the entire project">
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
+        </action>
+
+        <!-- Add a separator after Problem Grabber actions -->
+        <action id="ProblemGrabber.SeparatorAfter" class="com.intellij.openapi.actionSystem.Separator">
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
+        </action>
     </actions>
 </idea-plugin>

@@ -30,8 +30,32 @@ class ProblemGrabberService(private val project: Project) {
         "INJECTED_FRAGMENT_SYNTAX_SEVERITY",
         "INJECTED_FRAGMENT_SEVERITY",
         "ELEMENT_UNDER_CARET_SEVERITY",
-        "HIGHLIGHTED_REFERENCE_SEVERITY"
+        "HIGHLIGHTED_REFERENCE_SEVERITY",
+        "GRAMMAR_ERROR",
+        "TYPO"
     )
+
+    // Add common type keys to exclude
+    private val excludedTypeKeys = setOf(
+        "UNUSED_IMPORT",
+        "JavaDoc",
+        "SpellCheckingInspection",
+        "UNUSED_SYMBOL",
+        "ControlFlowStatementWithoutBraces",
+        "UnnecessaryUnicodeEscape",
+        "UnnecessaryInterfaceModifier",
+        "UnnecessaryModifier",
+        "RedundantSuppression"
+    )
+
+    /**
+     * Extract the key from a HighlightInfoType string
+     */
+    private fun extractTypeKey(typeString: String): String {
+        val keyPattern = Regex("key=([^,\\]]+)")
+        val keyMatch = keyPattern.find(typeString)
+        return keyMatch?.groupValues?.get(1) ?: typeString
+    }
 
     /**
      * Get problems for the current project
@@ -102,9 +126,10 @@ class ProblemGrabberService(private val project: Project) {
 
         // Filter by severity if requested, and always exclude non-problem severities
         val filteredHighlights = highlights.filter { info ->
-            // Include only if it passes both filters
+            // Include only if it passes all filters
             (severityFilter == null || severityFilter.contains(info.severity)) &&
-                    !excludedSeverities.contains(info.severity.name)
+                    !excludedSeverities.contains(info.severity.name) &&
+                    !excludedTypeKeys.contains(extractTypeKey(info.type.toString()))
         }
 
         return filteredHighlights.map { info ->

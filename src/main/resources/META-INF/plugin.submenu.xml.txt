@@ -1,0 +1,44 @@
+<idea-plugin>
+    <id>com.github.davidmoshal.problemgrabber</id>
+    <name>Problem Grabber</name>
+    <vendor>davidmoshal</vendor>
+    <description><![CDATA[
+    Capture and export code problems at the file, module, or project level.
+    ]]></description>
+
+    <depends>com.intellij.modules.platform</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <!-- Register notification group properly -->
+        <notificationGroup id="ProblemGrabber"
+                           displayType="BALLOON"
+                           toolWindowId="Problems"/>
+    </extensions>
+
+    <actions>
+        <group id="ProblemGrabber.Group" text="Problem Grabber" popup="true">
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
+
+            <action id="ProblemGrabber.CaptureFileErrors"
+                    class="com.github.davidmoshal.problemgrabber.actions.CaptureFileErrorsAction"
+                    text="Capture File Errors"
+                    description="Capture error-level problems in the current file"/>
+
+            <action id="ProblemGrabber.CaptureFileProblems"
+                    class="com.github.davidmoshal.problemgrabber.actions.CaptureFileProblemsAction"
+                    text="Capture File Problems"
+                    description="Capture all problems in the current file"/>
+
+            <action id="ProblemGrabber.CaptureProjectErrors"
+                    class="com.github.davidmoshal.problemgrabber.actions.CaptureProjectErrorsAction"
+                    text="Capture Project Errors"
+                    description="Capture error-level problems in the entire project"/>
+
+            <action id="ProblemGrabber.CaptureProjectProblems"
+                    class="com.github.davidmoshal.problemgrabber.actions.CaptureProjectProblemsAction"
+                    text="Capture Project Problems"
+                    description="Capture all problems in the entire project"/>
+        </group>
+    </actions>
+</idea-plugin>
