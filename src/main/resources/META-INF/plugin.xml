@@ -1,45 +1,28 @@
-<!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
     <id>com.github.davidmoshal.problemgrabber</id>
     <name>Problem Grabber</name>
     <vendor>davidmoshal</vendor>
     <description><![CDATA[
-        Capture IntelliJ problems for sharing with LLMs.
-        <br>
-        Features:
-        <ul>
-            <li>Capture problems in a file</li>
-            <li>Capture all project problems</li>
-            <li>Format problems in LLM-friendly markdown format</li>
-            <li>Copy to clipboard for easy sharing</li>
-        </ul>
+    Capture and export code problems at the file, module, or project level.
     ]]></description>
-    <version>1.0.0</version>
-    <change-notes><![CDATA[
-        Initial release of Problem Grabber.
-    ]]></change-notes>
-
-    <!-- Specify compatibility with IntelliJ platform versions -->
-    <idea-version since-build="233" until-build="244.*" />
 
     <depends>com.intellij.modules.platform</depends>
-    <depends>com.intellij.modules.lang</depends>
 
-    <!-- No service registration needed since we're using @Service annotation -->
+    <extensions defaultExtensionNs="com.intellij">
+        <notificationGroup id="Problem Grabber"
+                           displayType="BALLOON"
+                           toolWindowId="Problems"/>
+    </extensions>
 
     <actions>
-        <!-- Add main action -->
-        <action id="ProblemGrabber.CaptureProblems"
-                class="com.github.davidmoshal.problemgrabber.actions.CaptureProblemsAction"
-                text="Capture Problems for LLM"
-                description="Copy problems to clipboard in LLM-friendly format">
-            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
+        <!-- Main Problem Grabber action group -->
+        <group id="ProblemGrabber.MainGroup"
+               class="com.github.davidmoshal.problemgrabber.actions.CaptureProblemsAction"
+               text="Problem Grabber"
+               description="Problem Grabber tools"
+               popup="true">
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
-            <add-to-group group-id="ConsoleEditorPopupMenu" anchor="last"/>
-            <add-to-group group-id="EditorTabPopupMenu" anchor="last"/>
-            <add-to-group group-id="ToolsMenu" anchor="last"/>
-            <keyboard-shortcut keymap="$default" first-keystroke="alt shift P" />
-        </action>
+            <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
+        </group>
     </actions>
-
 </idea-plugin>
