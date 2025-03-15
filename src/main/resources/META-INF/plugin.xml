@@ -25,12 +25,7 @@
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.modules.lang</depends>
 
-    <projectListeners>
-    </projectListeners>
-
-    <projectServices>
-        <service serviceImplementation="com.github.davidmoshal.problemgrabber.services.ProblemGrabberService"/>
-    </projectServices>
+    <!-- No service registration needed since we're using @Service annotation -->
 
     <actions>
         <!-- Add main action -->
@@ -40,6 +35,8 @@
                 description="Copy problems to clipboard in LLM-friendly format">
             <add-to-group group-id="ProjectViewPopupMenu" anchor="last"/>
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+            <add-to-group group-id="ConsoleEditorPopupMenu" anchor="last"/>
+            <add-to-group group-id="EditorTabPopupMenu" anchor="last"/>
             <add-to-group group-id="ToolsMenu" anchor="last"/>
             <keyboard-shortcut keymap="$default" first-keystroke="alt shift P" />
         </action>

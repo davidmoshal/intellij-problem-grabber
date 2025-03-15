@@ -1,13 +1,14 @@
 package com.github.davidmoshal.problemgrabber.services
 
 import com.github.davidmoshal.problemgrabber.models.ProblemData
-import com.intellij.analysis.problemsView.toolWindow.ProblemsView
 import com.intellij.codeInsight.daemon.impl.DaemonCodeAnalyzerImpl
 import com.intellij.codeInsight.daemon.impl.HighlightInfo
+import com.intellij.lang.annotation.HighlightSeverity
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.fileEditor.FileDocumentManager
+import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.TextRange
 import com.intellij.openapi.vfs.VirtualFile
@@ -29,30 +30,27 @@ class ProblemGrabberService(private val project: Project) {
 
         val problems = mutableListOf<ProblemData>()
 
-        // This is a simplified implementation
-        // In a real plugin, you would need to access all files with problems
-        val psiManager = PsiManager.getInstance(project)
-        val fileDocumentManager = FileDocumentManager.getInstance()
-
         // Get all open files
-        val fileEditorManager = com.intellij.openapi.fileEditor.FileEditorManager.getInstance(project)
+        val fileEditorManager = FileEditorManager.getInstance(project)
         val openFiles = fileEditorManager.openFiles
 
         for (file in openFiles) {
-            val psiFile = psiManager.findFile(file) ?: continue
-            val document = fileDocumentManager.getDocument(file) ?: continue
-
-            // Get highlighting info for this file
-            val highlights = DaemonCodeAnalyzerImpl.getHighlights(document, null, project)
-            if (highlights == null || highlights.isEmpty()) continue
-
-            for (info in highlights) {
-                val problemData = convertToProblemData(info, file, document, psiFile)
-                problems.add(problemData)
-            }
+            problems.addAll(getProblemsForFile(file))
         }
 
         return problems
+    }
+
+    private fun isActualProblem(info: HighlightInfo): Boolean {
+        // Only include errors, warnings, and weak warnings
+        return when (info.severity) {
+            HighlightSeverity.ERROR -> true
+            HighlightSeverity.WARNING -> true
+            HighlightSeverity.WEAK_WARNING -> true
+            HighlightSeverity.INFORMATION -> true
+            // Exclude SYMBOL_TYPE_SEVERITY and others
+            else -> false
+        }
     }
 
     /**
@@ -73,10 +71,16 @@ class ProblemGrabberService(private val project: Project) {
         val highlights = DaemonCodeAnalyzerImpl.getHighlights(document, null, project)
         if (highlights == null || highlights.isEmpty()) return emptyList()
 
+        LOG.info("Found ${highlights.size} highlights for file ${file.name}")
+
         for (info in highlights) {
             val problemData = convertToProblemData(info, file, document, psiFile)
-            problems.add(problemData)
+            if (problemData != null) {
+                problems.add(problemData)
+            }
         }
+
+        LOG.info("Filtered to ${problems.size} actual problems")
 
         return problems
     }
@@ -84,8 +88,16 @@ class ProblemGrabberService(private val project: Project) {
     /**
      * Convert HighlightInfo to ProblemData
      */
-    private fun convertToProblemData(info: HighlightInfo, file: VirtualFile, document: Document, psiFile: PsiFile): ProblemData {
-        // Get line and column numbers
+    /**
+     * Convert HighlightInfo to ProblemData
+     */
+    private fun convertToProblemData(info: HighlightInfo, file: VirtualFile, document: Document, psiFile: PsiFile): ProblemData? {
+        // Only include actual errors and warnings
+        if (!isActualProblem(info)) {
+            return null
+        }
+
+        // Rest of the method stays the same
         val startOffset = info.startOffset
         val lineNumber = document.getLineNumber(startOffset)
         val lineStartOffset = document.getLineStartOffset(lineNumber)
@@ -96,7 +108,7 @@ class ProblemGrabberService(private val project: Project) {
         val surroundingCode = extractSurroundingCode(document, lineNumber, 3)
 
         return ProblemData(
-            message = info.description,
+            message = info.description ?: "Unknown problem",
             description = info.toolTip ?: "",
             type = info.type.toString(),
             fileName = file.path,
@@ -113,9 +125,6 @@ class ProblemGrabberService(private val project: Project) {
      * Get quick fix information if available
      */
     private fun getQuickFix(info: HighlightInfo, psiFile: PsiFile): String? {
-        // This is a placeholder - in a real plugin, you would need to
-        // get actual quick fix information from the highlighting info
-        // This requires more complex integration with IntelliJ's APIs
         return info.quickFixActionRanges?.firstOrNull()?.first?.action?.text
     }
 

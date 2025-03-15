@@ -6,6 +6,13 @@ Problem Grabber captures problem details from IntelliJ IDEA in a format optimize
 
 ## Features
 
+- Capture problems in a specific file
+- Capture all problems in a project
+- Format problems in LLM-friendly markdown format
+- Copy formatted problems to clipboard for easy sharing with LLMs
+
+### Features (from more comprehensive first iteration, which we simplified)
+TODO: consider adding these if missing:
 - Capture single problem details
 - Capture all problems in a file
 - Capture all problems in a project
@@ -13,6 +20,20 @@ Problem Grabber captures problem details from IntelliJ IDEA in a format optimize
 - Export to clipboard or file
 - Format problems in LLM-friendly format
 
+## Usage
+
+1. Right-click on a file in the Project view or Editor
+2. Select "Capture Problems for LLM"
+3. Choose whether to capture problems in the current file or the entire project
+4. Problems will be copied to the clipboard in markdown format
+5. Paste into your favorite LLM chat interface
+
+## Building
+
+This plugin is built using Gradle. To build:
+
+```bash
+./gradlew build
 ---
 ORIGINAL:
 ---
