@@ -6,6 +6,9 @@
     Capture and export code problems at the file, module, or project level.
     ]]></description>
 
+    <!-- Specify compatibility with IntelliJ platform versions -->
+    <idea-version since-build="233" until-build="251.*" />
+
     <depends>com.intellij.modules.platform</depends>
 
     <extensions defaultExtensionNs="com.intellij">

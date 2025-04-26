@@ -30,7 +30,24 @@ TODO: consider adding these if missing:
 
 ## Building
 
-This plugin is built using Gradle. To build:
+This plugin is built using Gradle. 
 
-```bash
-./gradlew build 
+```shell
+# Clean and build the project
+./gradlew clean build             
+```
+
+```shell
+# Run IntelliJ with your plugin for testing
+./gradlew runIde                  
+```
+
+```shell
+ # Run IntelliJ in debug mode for troubleshooting
+./gradlew debugIde               
+```
+
+```shell
+# Build the deployable plugin zip with detailed logs
+./gradlew buildPlugin --info      
+```
