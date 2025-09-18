@@ -7,7 +7,7 @@
     ]]></description>
 
     <!-- Specify compatibility with IntelliJ platform versions -->
-    <idea-version since-build="233" until-build="251.*" />
+    <idea-version since-build="242" />
 
     <depends>com.intellij.modules.platform</depends>
 
